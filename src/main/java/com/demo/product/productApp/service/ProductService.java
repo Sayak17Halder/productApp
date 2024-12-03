@@ -34,7 +34,13 @@ public class ProductService {
     // Get All Products with Pagination and Sorting
     public Page<Product> getAllProducts(int page, int size, String sortBy, String order) {
         Sort sort = order.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        return productRepository.findAll(PageRequest.of(page, size, sort)).map(this::convertToPojo);
+        return productRepository
+                .findAll(PageRequest.of(page, size, sort))
+                .map(productEntity -> {
+                    Product product = new Product();
+                    BeanUtils.copyProperties(productEntity, product);
+                    return product;
+                });
     }
 
     // Get Product by ID
@@ -69,12 +75,26 @@ public class ProductService {
 
     // Search Products by Name
     public List<Product> searchProductsByName(String name) {
-        return productRepository.findByNameRegex(name).stream().map(this::convertToPojo).collect(Collectors.toList());
+        return productRepository.findByNameRegex(name)
+                .stream()
+                .map(productEntity -> {
+                    Product product = new Product();
+                    BeanUtils.copyProperties(productEntity, product);
+                    return product;
+                })
+                .collect(Collectors.toList());
     }
 
     // Find Products by Price Range
     public List<Product> findProductsByPriceRange(Double minPrice, Double maxPrice) {
-        return productRepository.findByProdPriceBetween(minPrice, maxPrice).stream().map(this::convertToPojo).collect(Collectors.toList());
+        return productRepository.findByProdPriceBetween(minPrice, maxPrice)
+                .stream()
+                .map(productEntity -> {
+                    Product product = new Product();
+                    BeanUtils.copyProperties(productEntity, product);
+                    return product;
+                })
+                .collect(Collectors.toList());
     }
 
     // Validate Product
