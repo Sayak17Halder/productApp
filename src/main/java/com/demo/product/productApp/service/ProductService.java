@@ -6,13 +6,16 @@ import com.demo.product.productApp.model.Product;
 import com.demo.product.productApp.repository.ProductRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +25,7 @@ public class ProductService {
     private ProductRepository productRepository;
 
     // Add Product
+    @CacheEvict(value = "products", allEntries = true)
     public Product addProduct(Product product) {
         ProductEntity productEntity = new ProductEntity();
         BeanUtils.copyProperties(product, productEntity);
@@ -32,6 +36,7 @@ public class ProductService {
     }
 
     // Get All Products with Pagination and Sorting
+    @Cacheable(value = "products", key = "'page:' + #page + ':size:' + #size + ':sortBy:' + #sortBy + ':order:' + #order")
     public Page<Product> getAllProducts(int page, int size, String sortBy, String order) {
         Sort sort = order.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         return productRepository
@@ -44,6 +49,7 @@ public class ProductService {
     }
 
     // Get Product by ID
+    @Cacheable(value = "product", key = "#id")
     public Product getProductById(String id) {
         ProductEntity entity = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product with ID " + id + " not found."));
@@ -53,6 +59,10 @@ public class ProductService {
     }
 
     // Delete Product
+    @Caching(evict = {
+            @CacheEvict(value = "product", key = "#id"),          // Evict single product by ID
+            @CacheEvict(value = "products", allEntries = true)   // Evict all products (pagination cache)
+    })
     public void deleteProduct(String id) {
         if (!productRepository.existsById(id)) {
             throw new IllegalArgumentException("Product with ID " + id + " not found.");
@@ -61,6 +71,8 @@ public class ProductService {
     }
 
     // Update Product
+    @CachePut(value = "product", key = "#id")
+    @CacheEvict(value = "products", allEntries = true)
     public Product updateProduct(String id, Product product) {
         ProductEntity existingEntity = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product with ID " + id + " not found."));
@@ -74,6 +86,7 @@ public class ProductService {
     }
 
     // Search Products by Name
+    @Cacheable(value = "productsByName", key = "#name")
     public List<Product> searchProductsByName(String name) {
         return productRepository.findByNameRegex(name)
                 .stream()
@@ -104,10 +117,6 @@ public class ProductService {
         }
     }
 
-    // Convert Entity to POJO
-    private Product convertToPojo(ProductEntity entity) {
-        return new Product(entity.getId(), entity.getProdName(), entity.getProdPrice(), entity.getProdDateOfMan());
-    }
 }
 
 
