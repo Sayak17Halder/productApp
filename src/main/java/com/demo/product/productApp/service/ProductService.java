@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,12 +28,9 @@ public class ProductService {
     // Add Product
     @CacheEvict(value = "products", allEntries = true)
     public Product addProduct(Product product) {
-        ProductEntity productEntity = new ProductEntity();
-        BeanUtils.copyProperties(product, productEntity);
+        ProductEntity productEntity = toEntity(product);
         ProductEntity savedEntity = productRepository.save(productEntity);
-        Product product1 = new Product();
-        BeanUtils.copyProperties(savedEntity, product1);
-        return product1;
+        return toDTO(savedEntity);
     }
 
     // Get All Products with Pagination and Sorting
@@ -41,21 +39,15 @@ public class ProductService {
         Sort sort = order.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         return productRepository
                 .findAll(PageRequest.of(page, size, sort))
-                .map(productEntity -> {
-                    Product product = new Product();
-                    BeanUtils.copyProperties(productEntity, product);
-                    return product;
-                });
+                .map(this::toDTO);
     }
 
     // Get Product by ID
     @Cacheable(value = "product", key = "#id")
     public Product getProductById(String id) {
         ProductEntity entity = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product with ID " + id + " not found."));
-        Product product = new Product();
-        BeanUtils.copyProperties(entity, product);
-        return product;
+                .orElseThrow(() -> new NoSuchElementException("Product with ID " + id + " not found."));
+        return toDTO(entity);
     }
 
     // Delete Product
@@ -80,9 +72,7 @@ public class ProductService {
         existingEntity.setProdPrice(product.getProdPrice());
         existingEntity.setProdDateOfMan(product.getProdDateOfMan());
         ProductEntity updatedEntity = productRepository.save(existingEntity);
-        Product product1 = new Product();
-        BeanUtils.copyProperties(updatedEntity, product1);
-        return product1;
+        return toDTO(updatedEntity);
     }
 
     // Search Products by Name
@@ -90,11 +80,7 @@ public class ProductService {
     public List<Product> searchProductsByName(String name) {
         return productRepository.findByNameRegex(name)
                 .stream()
-                .map(productEntity -> {
-                    Product product = new Product();
-                    BeanUtils.copyProperties(productEntity, product);
-                    return product;
-                })
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -102,12 +88,22 @@ public class ProductService {
     public List<Product> findProductsByPriceRange(Double minPrice, Double maxPrice) {
         return productRepository.findByProdPriceBetween(minPrice, maxPrice)
                 .stream()
-                .map(productEntity -> {
-                    Product product = new Product();
-                    BeanUtils.copyProperties(productEntity, product);
-                    return product;
-                })
+                .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    // Entity to dto
+    public Product toDTO(ProductEntity productEntity){
+        Product product = new Product();
+        BeanUtils.copyProperties(productEntity, product);
+        return product;
+    }
+
+    // dto to Entity
+    public ProductEntity toEntity(Product product){
+        ProductEntity productEntity = new ProductEntity();
+        BeanUtils.copyProperties(product, productEntity);
+        return productEntity;
     }
 
     // Validate Product
