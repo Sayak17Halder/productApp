@@ -147,5 +147,26 @@ class ProductServiceTest {
         assertEquals(100.0, result.get(0).getProdPrice());
         verify(productRepository, times(1)).findByProdPriceBetween(minPrice, maxPrice);
     }
+
+    @Test
+    void testToDTO() {
+        ProductEntity productEntity = new ProductEntity();
+        productEntity.setProdName("Entity Name");
+
+        Product product = productService.toDTO(productEntity);
+
+        assertNotNull(product);
+        assertEquals("Entity Name", product.getProdName());
+    }
+
+    @Test
+    void testToEntity() {
+        Product product = new Product("1", "Test Product", 100.0, LocalDate.now());
+
+        ProductEntity productEntity = productService.toEntity(product);
+
+        assertNotNull(productEntity);
+        assertEquals("Test Product", productEntity.getProdName());
+    }
 }
 

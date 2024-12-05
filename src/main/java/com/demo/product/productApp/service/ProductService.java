@@ -57,7 +57,7 @@ public class ProductService {
     })
     public void deleteProduct(String id) {
         if (!productRepository.existsById(id)) {
-            throw new IllegalArgumentException("Product with ID " + id + " not found.");
+            throw new NoSuchElementException("Product with ID " + id + " not found.");
         }
         productRepository.deleteById(id);
     }
@@ -67,7 +67,7 @@ public class ProductService {
     @CacheEvict(value = "products", allEntries = true)
     public Product updateProduct(String id, Product product) {
         ProductEntity existingEntity = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product with ID " + id + " not found."));
+                .orElseThrow(() -> new NoSuchElementException("Product with ID " + id + " not found."));
         existingEntity.setProdName(product.getProdName());
         existingEntity.setProdPrice(product.getProdPrice());
         existingEntity.setProdDateOfMan(product.getProdDateOfMan());
@@ -106,13 +106,4 @@ public class ProductService {
         return productEntity;
     }
 
-    // Validate Product
-    private void validateProduct(Product product) {
-        if (product.getProdPrice() <= 0) {
-            throw new IllegalArgumentException("Product price must be greater than zero.");
-        }
-    }
-
 }
-
-
