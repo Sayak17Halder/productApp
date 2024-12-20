@@ -1,8 +1,8 @@
 package com.demo.product.productApp.service;
 
 
-import com.demo.product.productApp.entity.ProductEntity;
-import com.demo.product.productApp.model.Product;
+import com.demo.product.productApp.model.entity.ProductEntity;
+import com.demo.product.productApp.model.dao.Product;
 import com.demo.product.productApp.repository.ProductRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

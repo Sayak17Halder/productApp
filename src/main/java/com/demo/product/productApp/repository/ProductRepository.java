@@ -1,6 +1,6 @@
 package com.demo.product.productApp.repository;
 
-import com.demo.product.productApp.entity.ProductEntity;
+import com.demo.product.productApp.model.entity.ProductEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import java.util.List;

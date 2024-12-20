@@ -1,6 +1,6 @@
 package com.demo.product.productApp.controller;
 
-import com.demo.product.productApp.model.Product;
+import com.demo.product.productApp.model.dao.Product;
 import com.demo.product.productApp.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

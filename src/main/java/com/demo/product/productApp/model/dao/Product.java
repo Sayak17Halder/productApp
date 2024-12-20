@@ -1,5 +1,6 @@
-package com.demo.product.productApp.model;
+package com.demo.product.productApp.model.dao;
 
+import com.demo.product.productApp.validation.ValidProductName;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -10,7 +11,7 @@ import java.time.LocalDate;
 public class Product {
 
     private String id;
-
+    @ValidProductName
     @NotBlank(message = "Product Name cannot be blank")
     private String prodName;
 
