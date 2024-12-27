@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 
-public interface ProductRepository extends MongoRepository<ProductEntity, String> {
+public interface ProductRepository extends MongoRepository<ProductEntity, String>, CustomProductRepository {
 
     @Query("{'prodName': { $regex: ?0, $options: 'i' }}")
     List<ProductEntity> findByNameRegex(String name);

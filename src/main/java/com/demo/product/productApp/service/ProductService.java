@@ -92,6 +92,14 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    // Get Products by Price Range using Mongo Template
+    public List<Product> getProductsByPriceRange(Double minPrice, Double maxPrice) {
+        List<ProductEntity> entities = productRepository.findProductsByPriceRange(minPrice, maxPrice);
+        return entities.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
     // Entity to dto
     public Product toDTO(ProductEntity productEntity){
         Product product = new Product();

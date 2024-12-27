@@ -58,6 +58,11 @@ public class ProductController {
             @RequestParam Double minPrice, @RequestParam Double maxPrice) {
         return ResponseEntity.ok(productService.findProductsByPriceRange(minPrice, maxPrice));
     }
+
+    @GetMapping(value = "/price-range2", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public List<Product> getProductsByPriceRange(@RequestParam Double minPrice, @RequestParam Double maxPrice) {
+        return productService.getProductsByPriceRange(minPrice, maxPrice);
+    }
 }
 
 
