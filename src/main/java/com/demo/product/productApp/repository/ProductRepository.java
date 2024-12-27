@@ -11,5 +11,7 @@ public interface ProductRepository extends MongoRepository<ProductEntity, String
     List<ProductEntity> findByNameRegex(String name);
 
     List<ProductEntity> findByProdPriceBetween(Double minPrice, Double maxPrice);
+
+    boolean existsByProdName(String prodName);
 }
 

@@ -1,5 +1,6 @@
 package com.demo.product.productApp.model.dao;
 
+import com.demo.product.productApp.validation.UniqueProductName;
 import com.demo.product.productApp.validation.ValidProductName;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -12,6 +13,7 @@ public class Product {
 
     private String id;
     @ValidProductName
+    @UniqueProductName
     @NotBlank(message = "Product Name cannot be blank")
     private String prodName;
 
